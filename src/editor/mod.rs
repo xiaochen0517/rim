@@ -19,6 +19,7 @@ impl Editor {
 
 impl Editor {
     pub(crate) fn show_content(&mut self, content: &FileContent) -> Result<(), String> {
+        execute!(self.stdout, crossterm::event::EnableMouseCapture).unwrap();
         // 清空屏幕
         render::render(&mut self.stdout, 1, content);
         Ok(())
@@ -27,6 +28,16 @@ impl Editor {
 
 impl Editor {
     pub(crate) fn move_up(&mut self) {
+        // 获取光标位置
+        let (x, y) = cursor::position().unwrap();
+        // 判断位置是否在第一行
+        if y == 0 {
+            // 判断当前内容是否为第一行，将内容向上滚动一行
+            if x == 0 {
+                self.scroll_up();
+            }
+            return;
+        }
         execute!(self.stdout, cursor::MoveUp(1)).unwrap();
     }
     pub(crate) fn move_down(&mut self) {

@@ -4,8 +4,8 @@ mod files;
 
 use std::io::{Cursor, Write};
 use clap::Parser;
-use crossterm::{cursor, event, QueueableCommand};
-use crossterm::event::{Event, KeyCode, KeyEventKind, MouseEvent, MouseEventKind};
+use crossterm::{cursor, event, execute, QueueableCommand};
+use crossterm::event::{EnableMouseCapture, Event, KeyCode, KeyEventKind, MouseEvent, MouseEventKind};
 use crate::files::reader;
 use crate::editor::Editor;
 
@@ -28,6 +28,13 @@ pub fn run() {
                     KeyCode::Left | KeyCode::Char('h') => current_editor.move_left(),
                     KeyCode::Right | KeyCode::Char('l') => current_editor.move_right(),
                     KeyCode::Char('f') => current_editor.scroll_up(),
+                    _ => {}
+                }
+            }
+            if let Event::Mouse(mouse) = event {
+                match mouse.kind {
+                    MouseEventKind::ScrollUp => current_editor.move_up(),
+                    MouseEventKind::ScrollDown => current_editor.move_down(),
                     _ => {}
                 }
             }

@@ -23,7 +23,7 @@ pub(crate) fn render(stdout: &mut std::io::Stdout, start_line: usize, file_conte
             last_line_number = line_info.line_number;
             print!("{}:", line_info.line_number);
         } else {
-            print!("-:");
+            print!(" :");
         }
         execute!(stdout, SetForegroundColor(Color::Reset)).unwrap();
         print!("{}", line_info.text);
