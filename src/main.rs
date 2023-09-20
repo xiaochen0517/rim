@@ -1,3 +1,5 @@
+use rim;
+
 fn main() {
-    println!("Hello, world!");
+    rim::run();
 }
