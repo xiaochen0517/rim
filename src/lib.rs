@@ -1,11 +1,11 @@
 mod args;
 mod editor;
-mod files;
 mod events;
+mod files;
 
-use clap::Parser;
-use crate::files::reader;
 use crate::editor::Editor;
+use crate::files::reader;
+use clap::Parser;
 
 pub fn run() {
     let args = args::Args::parse();

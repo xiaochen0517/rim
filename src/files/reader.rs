@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{BufRead};
+use std::io::BufRead;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Debug, Clone)]
@@ -49,7 +49,10 @@ impl FileContent {
                 line_text.push_str(grapheme);
                 line_str_len += 1;
                 if line_str_len == 40 {
-                    content_map.insert(real_line_number, Line::new(line_text, line_number, is_wrapped));
+                    content_map.insert(
+                        real_line_number,
+                        Line::new(line_text, line_number, is_wrapped),
+                    );
                     is_wrapped = true;
                     real_line_number += 1;
                     line_text = String::new();
@@ -57,7 +60,10 @@ impl FileContent {
                 }
             }
             if line_str_len > 0 {
-                content_map.insert(real_line_number, Line::new(line_text, line_number, is_wrapped));
+                content_map.insert(
+                    real_line_number,
+                    Line::new(line_text, line_number, is_wrapped),
+                );
                 real_line_number += 1;
             }
         }

@@ -1,6 +1,6 @@
 use crossterm::{cursor, execute, terminal};
 
-use crate::editor::{Editor, render};
+use crate::editor::{render, Editor};
 
 impl Editor {
     pub(crate) fn move_up(&mut self) {

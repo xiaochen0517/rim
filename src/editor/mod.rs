@@ -1,8 +1,8 @@
-mod render;
 mod cursor_controller;
+mod render;
 
-use crossterm::{execute};
 use crate::files::reader::FileContent;
+use crossterm::execute;
 
 pub(crate) struct Editor {
     pub(crate) terminal_height: usize,
@@ -42,6 +42,10 @@ impl Editor {
 
     pub(crate) fn clean_screen(&mut self) {
         // 清空屏幕
-        execute!(self.stdout, crossterm::terminal::Clear(crossterm::terminal::ClearType::All)).unwrap();
+        execute!(
+            self.stdout,
+            crossterm::terminal::Clear(crossterm::terminal::ClearType::All)
+        )
+        .unwrap();
     }
 }

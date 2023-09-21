@@ -1,11 +1,11 @@
-use std::io::{Stdout, Write};
-use std::iter;
-use crossterm::execute;
-use crossterm::cursor;
-use crossterm::terminal::{Clear, ClearType};
-use crossterm::style::{Color, SetBackgroundColor, SetForegroundColor};
 use crate::editor::Editor;
 use crate::files::reader::Line;
+use crossterm::cursor;
+use crossterm::execute;
+use crossterm::style::{Color, SetBackgroundColor, SetForegroundColor};
+use crossterm::terminal::{Clear, ClearType};
+use std::io::{Stdout, Write};
+use std::iter;
 
 pub(crate) fn render_all(editor: &mut Editor, start_line: usize) {
     // 清空屏幕
@@ -71,7 +71,10 @@ pub(crate) fn render_scroll_up(editor: &mut Editor) {
     let file_content = &editor.file_content;
     execute!(stdout, Clear(ClearType::CurrentLine)).unwrap();
     execute!(stdout, cursor::MoveTo(0, cursor_position.1)).unwrap();
-    match file_content.content.get(&(editor.start_line + editor.content_height + 1)) {
+    match file_content
+        .content
+        .get(&(editor.start_line + editor.content_height + 1))
+    {
         Some(line_info) => {
             render_content_line(stdout, editor.content_height as u16, line_info);
         }
@@ -110,18 +113,25 @@ pub(crate) fn render_command_line(editor: &mut Editor) {
     let cursor_position = cursor::position().unwrap().clone();
     // 设置命令行背景色
     execute!(
-            stdout,
-            cursor::MoveTo(0, editor.terminal_height as u16),
-            SetBackgroundColor(Color::White),
-            SetForegroundColor(Color::Black)
-        ).unwrap();
+        stdout,
+        cursor::MoveTo(0, editor.terminal_height as u16),
+        SetBackgroundColor(Color::White),
+        SetForegroundColor(Color::Black)
+    )
+    .unwrap();
     print!(":");
-    print!("{}", iter::repeat(' ').take(editor.terminal_width as usize - 1).collect::<String>());
+    print!(
+        "{}",
+        iter::repeat(' ')
+            .take(editor.terminal_width as usize - 1)
+            .collect::<String>()
+    );
     stdout.flush().unwrap();
     execute!(
-            stdout,
-            cursor::MoveTo(cursor_position.0, cursor_position.1),
-            SetBackgroundColor(Color::Reset),
-            SetForegroundColor(Color::Reset)
-        ).unwrap();
+        stdout,
+        cursor::MoveTo(cursor_position.0, cursor_position.1),
+        SetBackgroundColor(Color::Reset),
+        SetForegroundColor(Color::Reset)
+    )
+    .unwrap();
 }

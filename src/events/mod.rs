@@ -1,5 +1,5 @@
 use crate::editor::Editor;
-use crossterm::{event};
+use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind, MouseEventKind};
 
 pub(crate) fn run(current_editor: &mut Editor) {
