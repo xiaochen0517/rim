@@ -21,7 +21,7 @@ impl Editor {
             None => 1,
         };
         // 渲染内容
-        for index in start_line..(file_content.len() - 1) {
+        for index in start_line..file_content.len() {
             // 如果当前行数大于屏幕高度-1，则退出循环
             let render_terminal_line = index - start_line;
             if render_terminal_line > edit_height_size {
@@ -46,7 +46,7 @@ impl Editor {
             }
         }
         if end_index < edit_height_size {
-            for index in end_index + 1..edit_height_size {
+            for index in end_index + 1..edit_height_size + 1 {
                 render_empty_line(self, index as u16);
             }
         }

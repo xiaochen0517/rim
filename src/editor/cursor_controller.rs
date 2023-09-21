@@ -1,4 +1,5 @@
 use crossterm::{cursor, execute, terminal};
+use unicode_segmentation::UnicodeSegmentation;
 
 use crate::editor::Editor;
 
@@ -37,7 +38,13 @@ impl Editor {
         // 获取光标位置
         let (cursor_width, cursor_height) = cursor::position().unwrap();
         let current_line_number = self.start_line + cursor_height as usize;
-        let current_line_info = self.file_content.content.get(&current_line_number).unwrap();
+        let current_line_info = match self.file_content.content.get(&current_line_number) {
+            Some(line_info) => line_info,
+            None => {
+                execute!(self.stdout, cursor::MoveTo(0, cursor_height)).unwrap();
+                return true;
+            }
+        };
         // 检查行字符串末尾是否为换行符
         let mut current_line_text_len = current_line_info.text.len();
         if current_line_info.text.ends_with('\n') {
@@ -63,16 +70,18 @@ impl Editor {
         // 获取光标位置
         let (cursor_width, cursor_height) = cursor::position().unwrap();
         let current_line_number = self.start_line + cursor_height as usize;
-        let current_line_info = self.file_content.content.get(&current_line_number).unwrap();
+        let current_line_info = match self.file_content.content.get(&current_line_number) {
+            Some(line_info) => line_info,
+            None => {
+                return;
+            }
+        };
         // 检查行字符串末尾是否为换行符
-        let mut current_line_text_len = current_line_info.text.len();
-        // let string = current_line_info.text.replace("\n", "1");
-        // let string = string.replace("\r", "2");
-        // print!("str => {}", string);
+        let mut current_line_text_len = current_line_info.text.graphemes(true).count();
         if current_line_info.text.ends_with("\r\n") {
             current_line_text_len -= 1;
         }
-        if cursor_width as usize == self.line_number_len + current_line_text_len {
+        if cursor_width as usize > self.line_number_len + current_line_text_len {
             return;
         }
         execute!(self.stdout, cursor::MoveRight(1)).unwrap();
