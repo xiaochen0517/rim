@@ -3,7 +3,6 @@ mod editor;
 mod files;
 mod events;
 
-use std::io::{Write};
 use clap::Parser;
 use crate::files::reader;
 use crate::editor::Editor;

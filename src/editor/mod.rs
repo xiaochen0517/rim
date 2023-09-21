@@ -1,7 +1,6 @@
 mod render;
 mod cursor_controller;
 
-use std::io::Write;
 use crossterm::{execute};
 use crate::files::reader::FileContent;
 
