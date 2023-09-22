@@ -51,7 +51,7 @@ impl Editor {
         // 获取光标位置
         let (cursor_width, cursor_height) = cursor::position().unwrap();
         let current_line_number = self.start_line + cursor_height as usize;
-        let current_line_info = match self.file_content.content.get(&current_line_number) {
+        let current_line_info = match self.file_content.content.get(current_line_number) {
             Some(line_info) => line_info,
             None => {
                 return;
