@@ -19,6 +19,7 @@ pub(crate) struct Editor {
     pub(crate) file_content: FileContent,
     pub(crate) is_command_mode: bool,
     pub(crate) command_line: String,
+    pub(crate) is_editor_mode: bool,
 }
 
 impl Editor {
@@ -36,6 +37,7 @@ impl Editor {
             file_content,
             is_command_mode: false,
             command_line: String::new(),
+            is_editor_mode: false,
         }
     }
 }
@@ -69,6 +71,51 @@ impl Editor {
             self.switch_command_mode(false);
         }
     }
+
+    pub(crate) fn switch_edit_mode(&mut self, mode: bool) {
+        self.is_editor_mode = mode;
+        if mode {
+            self.command_line = "--INSERT--".to_string();
+        } else {
+            self.command_line = String::new();
+        }
+        Render::render_command_line(&mut stdout(), self);
+    }
+}
+
+impl Editor {
+    pub(crate) fn add_content_char(&mut self, char: char) {
+        let mut stdout = stdout();
+        let (cursor_width, cursor_height) = cursor::position().unwrap();
+        // 获取当前行数
+        let current_line_number = self.start_line + cursor_height as usize;
+        // 获取当前行信息
+        let mut current_line_info = match self.file_content.content.get_mut(current_line_number) {
+            Some(line_info) => line_info,
+            None => {
+                // 获取最后一行信息
+                let last_line_info = self.file_content.content.last().unwrap();
+                return;
+            }
+        };
+        // 添加字符
+        current_line_info
+            .text
+            .insert(cursor_width as usize - self.line_number_len - 1, char);
+        // 更新当前行信息
+        Render::render_content_line(
+            &mut stdout,
+            self.line_number_len,
+            cursor_height,
+            &current_line_info,
+        );
+        // 更新光标位置
+        self.move_right();
+    }
+
+    pub(crate) fn delete_content_char(&mut self) {}
+
+    pub(crate) fn line_feed(&mut self) {}
 }
 
 impl Editor {

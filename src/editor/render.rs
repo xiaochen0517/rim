@@ -148,7 +148,12 @@ impl Render {
         line_number: u16,
         line_info: &Line,
     ) {
+        // 获取当前光标位置
+        let cursor_position = cursor::position().unwrap().clone();
+        // 移动光标到起使位置
         execute!(stdout, cursor::MoveTo(0, line_number)).unwrap();
+        // 清空当前行
+        execute!(stdout, Clear(ClearType::CurrentLine)).unwrap();
         execute!(stdout, SetForegroundColor(Color::Blue)).unwrap();
         let mut line_number_str = line_info.line_number.to_string();
         if line_info.is_wrapped {
@@ -164,6 +169,8 @@ impl Render {
         execute!(stdout, SetForegroundColor(Color::Reset)).unwrap();
         print!("{}", line_info.text);
         stdout.flush().unwrap();
+        // 恢复光标位置
+        execute!(stdout, cursor::MoveTo(cursor_position.0, cursor_position.1)).unwrap();
     }
 
     pub(crate) fn render_empty_line(stdout: &mut Stdout, line_number: u16) {
