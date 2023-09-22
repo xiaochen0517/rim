@@ -2,11 +2,12 @@ use crate::editor::Editor;
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers, MouseEventKind};
 
+use crate::editor::render::Render;
+
 pub(crate) fn run(current_editor: &mut Editor) {
     current_editor.enable_mouse_capture();
     loop {
         if let Ok(event) = event::read() {
-            // println!("{:?}", event);
             if let Event::Key(key) = event {
                 if key.kind == KeyEventKind::Press {
                     continue;
@@ -30,7 +31,8 @@ pub(crate) fn run(current_editor: &mut Editor) {
                 }
                 match key.code {
                     KeyCode::Char('q') => {
-                        current_editor.clean_screen();
+                        Editor::reset_cursor();
+                        Render::clean_screen();
                         break;
                     }
                     KeyCode::Up | KeyCode::Char('k') => current_editor.move_up(),
