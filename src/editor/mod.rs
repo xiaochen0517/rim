@@ -61,7 +61,7 @@ impl Editor {
 
     pub(crate) fn append_command_line(&mut self, c: char) {
         self.command_line.push(c);
-        // Render::render_command_line(&mut self.render.stdout, self);
+        Render::render_command_line(&mut stdout(), self);
     }
 
     pub(crate) fn pop_command_line(&mut self) {
