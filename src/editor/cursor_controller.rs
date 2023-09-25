@@ -1,11 +1,15 @@
+use std::io::stdout;
+
 use crossterm::{cursor, execute, terminal};
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::editor::render::Render;
 use crate::editor::Editor;
-use std::io::stdout;
 
 impl Editor {
+    pub(crate) fn reset_cursor() {
+        execute!(stdout(), cursor::MoveTo(0, 0)).unwrap();
+    }
     pub(crate) fn move_up(&mut self) {
         let mut stdout = stdout();
         // 获取光标位置
