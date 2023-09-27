@@ -1,11 +1,15 @@
+use std::io::stdout;
+
 use crossterm::{cursor, execute, terminal};
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::editor::render::Render;
 use crate::editor::Editor;
-use std::io::stdout;
 
 impl Editor {
+    pub(crate) fn reset_cursor() {
+        execute!(stdout(), cursor::MoveTo(0, 0)).unwrap();
+    }
     pub(crate) fn move_up(&mut self) {
         let mut stdout = stdout();
         // 获取光标位置
@@ -26,7 +30,8 @@ impl Editor {
         let (_, cursor_height) = cursor::position().unwrap();
         // 判断位置是否在最后一行，且当前显示的内容还存在剩余行
         if cursor_height as usize == self.content_height {
-            if (self.start_line + self.content_height) < self.file_content.content.len() - 1 {
+            let file_content_size = self.file_content.len();
+            if (self.start_line + self.content_height) < file_content_size - 1 {
                 self.scroll_up();
                 Render::render_scroll_up(&mut stdout, self);
             }
@@ -36,7 +41,7 @@ impl Editor {
         Render::check_line_end(&mut stdout, self);
     }
 
-    pub(crate) fn move_left(&mut self) {
+    pub(crate) fn move_left(&self) {
         let mut stdout = stdout();
         // 获取光标位置
         let (cursor_width, _) = cursor::position().unwrap();
@@ -51,7 +56,7 @@ impl Editor {
         // 获取光标位置
         let (cursor_width, cursor_height) = cursor::position().unwrap();
         let current_line_number = self.start_line + cursor_height as usize;
-        let current_line_info = match self.file_content.content.get(current_line_number) {
+        let current_line_info = match self.file_content.get(current_line_number) {
             Some(line_info) => line_info,
             None => {
                 return;
@@ -59,7 +64,7 @@ impl Editor {
         };
         // 检查行字符串末尾是否为换行符
         let mut current_line_text_len = current_line_info.text.graphemes(true).count();
-        if current_line_info.text.ends_with("\r\n") {
+        if current_line_info.text.ends_with("\n") {
             current_line_text_len -= 1;
         }
         if cursor_width as usize > self.line_number_len + current_line_text_len {

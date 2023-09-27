@@ -1,6 +1,6 @@
 mod command_mode;
 mod default_mode;
-mod editor_mode;
+mod edit_mode;
 
 use crate::editor::Editor;
 use crossterm::event;
@@ -15,7 +15,7 @@ pub(crate) fn run(current_editor: &mut Editor) {
                     continue;
                 }
                 if current_editor.is_editor_mode {
-                    editor_mode::handle_event(key, current_editor);
+                    edit_mode::handle_event(key, current_editor);
                     continue;
                 }
                 if current_editor.is_command_mode {
