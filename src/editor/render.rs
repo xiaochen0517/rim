@@ -1,11 +1,13 @@
-use crate::editor::Editor;
-use crate::files::reader::Line;
+use std::io::{stdout, Stdout, Write};
+use std::iter;
+
 use crossterm::cursor;
 use crossterm::execute;
 use crossterm::style::{Color, SetBackgroundColor, SetForegroundColor};
 use crossterm::terminal::{Clear, ClearType};
-use std::io::{stdout, Stdout, Write};
-use std::iter;
+
+use crate::editor::Editor;
+use crate::files::reader::Line;
 
 pub struct Render {}
 
@@ -26,7 +28,6 @@ impl Render {
         // 计算行号的最大长度
         Self::refresh_line_number_len(editor);
         // 渲染内容
-        let file_content = &editor.file_content.content;
         for index in start_line..start_line + editor.terminal_height {
             // 如果当前行数大于屏幕高度-1，则退出循环
             let render_terminal_line = index - start_line;
@@ -34,7 +35,7 @@ impl Render {
                 break;
             }
             // 获取当前行信息并判断当前行是否存在
-            match file_content.get(index) {
+            match editor.file_content.get(index) {
                 // 如果存在，则打印当前行
                 Some(line_info) => {
                     Self::render_content_line(
@@ -53,8 +54,7 @@ impl Render {
     }
 
     fn refresh_line_number_len(editor: &mut Editor) {
-        let file_content = &editor.file_content.content;
-        editor.line_number_len = match file_content.get(file_content.len() - 2) {
+        editor.line_number_len = match editor.file_content.get(editor.file_content.len() - 2) {
             Some(line_info) => line_info.line_number.to_string().len(),
             None => 1,
         };
@@ -70,8 +70,7 @@ impl Render {
         let current_start_line = editor.start_line - 1;
         execute!(stdout, Clear(ClearType::CurrentLine)).unwrap();
         execute!(stdout, cursor::MoveTo(0, 0)).unwrap();
-        let file_content = &editor.file_content;
-        let first_line = file_content.content.get(current_start_line);
+        let first_line = editor.file_content.get(current_start_line);
         match first_line {
             Some(line_info) => {
                 Render::render_content_line(stdout, editor.line_number_len, 0, line_info)
@@ -93,7 +92,6 @@ impl Render {
         execute!(stdout, cursor::MoveTo(0, cursor_position.1)).unwrap();
         match editor
             .file_content
-            .content
             .get(editor.start_line + editor.content_height + 1)
         {
             Some(line_info) => {
@@ -185,7 +183,7 @@ impl Render {
         let (cursor_width, cursor_height) = cursor::position().unwrap();
         let cursor_width = cursor_width as usize;
         let current_line_number = editor.start_line + cursor_height as usize;
-        let current_line_info = match editor.file_content.content.get(current_line_number) {
+        let current_line_info = match editor.file_content.get(current_line_number) {
             Some(line_info) => line_info,
             None => {
                 execute!(
