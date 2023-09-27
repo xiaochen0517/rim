@@ -71,6 +71,7 @@ impl Editor {
             return;
         }
         execute!(stdout, cursor::MoveRight(1)).unwrap();
+        info!("move_right");
     }
     pub(crate) fn scroll_up(&mut self) {
         let mut stdout = stdout();

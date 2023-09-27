@@ -57,10 +57,12 @@ impl Editor {
             if line_info.text.len() <= self.terminal_width - self.line_number_len {
                 return;
             }
-            let left_string = line_info
-                .text
-                .split_off(self.terminal_width - self.line_number_len - 1);
-            (left_string, line_info.line_number)
+            (
+                line_info
+                    .text
+                    .split_off(self.terminal_width - self.line_number_len - 1),
+                line_info.line_number,
+            )
         };
         // 获取下一行内容
         let next_content_index = current_content_index + 1;
