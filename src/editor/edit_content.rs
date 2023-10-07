@@ -38,20 +38,24 @@ impl Editor {
             cursor_height,
             &edited_line_info,
         );
+        let mut index = 1;
         for refresh_content_index in refresh_index_vec.into_iter() {
+            info!("refresh_content_index: {}", refresh_content_index);
             let refresh_line_info = self.file_content.get(refresh_content_index).unwrap();
             Render::render_content_line(
                 &mut stdout,
                 self.line_number_len,
-                cursor_height,
+                cursor_height + index,
                 refresh_line_info,
             );
+            index += 1;
         }
         self.move_right();
     }
 
     fn set_line_wrapped(&mut self, current_content_index: usize, refresh_vec: &mut Vec<usize>) {
         let (_cursor_width, cursor_height) = cursor::position().unwrap();
+        let cursor_height = cursor_height as usize + 1;
         let (new_line_string, line_number) = {
             let line_info = self.file_content.get_mut(current_content_index).unwrap();
             if line_info.text.len() <= self.terminal_width - self.line_number_len {
