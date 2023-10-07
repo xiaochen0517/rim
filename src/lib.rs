@@ -26,10 +26,7 @@ pub fn run() {
     builder.filter(None, LevelFilter::Info);
 
     // 生成日志名称 log-{time}.txt
-    let log_file_name = format!(
-        "log-{}.txt",
-        chrono::Local::now().format("%Y-%m-%d-%H-%M-%S")
-    );
+    let log_file_name = format!("log-{}.txt", chrono::Local::now().format("%Y-%m-%d-%H"));
 
     // 打开日志文件
     let file = OpenOptions::new()
