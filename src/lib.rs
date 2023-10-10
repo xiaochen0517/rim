@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate log;
 
+use std::env;
 use std::fs::OpenOptions;
 use std::io::Write;
 
@@ -22,8 +23,9 @@ pub fn run() {
     std::fs::create_dir_all(LOG_PATH).unwrap();
 
     // 初始化env_logger
+    env::set_var("RUST_LOG", "trace");
     let mut builder = Builder::new();
-    builder.filter(None, LevelFilter::Info);
+    builder.filter(None, LevelFilter::Trace);
 
     // 生成日志名称 log-{time}.txt
     let log_file_name = format!("log-{}.txt", chrono::Local::now().format("%Y-%m-%d-%H"));
