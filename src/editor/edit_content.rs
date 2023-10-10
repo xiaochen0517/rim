@@ -28,9 +28,18 @@ impl Editor {
             .text
             .insert(cursor_width as usize - self.line_number_len - 1, char);
         let edited_line_info = current_line_info.clone();
-        let mut refresh_index_vec = Vec::new();
+        let mut refresh_line_number = 0;
+        debug!("current_line_info: {:?}", current_line_info);
+        debug!(
+            "current_line_info.text.len(): {}",
+            current_line_info.text.len()
+        );
+        debug!(
+            "self.terminal_content_width: {}",
+            self.terminal_width - self.line_number_len
+        );
         if current_line_info.text.len() > self.terminal_width - self.line_number_len {
-            self.set_line_wrapped(current_content_index, &mut refresh_index_vec);
+            refresh_line_number = self.set_line_wrapped(current_content_index, 0);
         }
         Render::render_content_line(
             &mut stdout,
@@ -38,50 +47,66 @@ impl Editor {
             cursor_height,
             &edited_line_info,
         );
-        for refresh_content_index in refresh_index_vec.into_iter() {
+        debug!("refresh_line_number: {}", refresh_line_number);
+        for refresh_add_index in 0..refresh_line_number {
+            let refresh_terminal_index = cursor_height + refresh_add_index as u16 + 1;
+            let refresh_content_index = current_content_index + refresh_add_index + 1;
             let refresh_line_info = self.file_content.get(refresh_content_index).unwrap();
+            debug!(
+                "refresh_terminal_index: {}, refresh_content_index: {}",
+                refresh_terminal_index, refresh_content_index
+            );
+            debug!("refresh_line_info: {:?}", refresh_line_info);
             Render::render_content_line(
                 &mut stdout,
                 self.line_number_len,
-                cursor_height,
+                refresh_terminal_index,
                 refresh_line_info,
             );
         }
         self.move_right();
     }
 
-    fn set_line_wrapped(&mut self, current_content_index: usize, refresh_vec: &mut Vec<usize>) {
-        let (_cursor_width, cursor_height) = cursor::position().unwrap();
+    fn set_line_wrapped(&mut self, current_content_index: usize, mut refresh_size: usize) -> usize {
         let (new_line_string, line_number) = {
             let line_info = self.file_content.get_mut(current_content_index).unwrap();
             if line_info.text.len() <= self.terminal_width - self.line_number_len {
-                return;
+                debug!("内容长度小于终端宽度，不需要换行");
+                return refresh_size;
             }
-            let left_string = line_info
-                .text
-                .split_off(self.terminal_width - self.line_number_len - 1);
-            (left_string, line_info.line_number)
+            debug!("内容长度大于终端宽度，需要换行");
+            (
+                line_info
+                    .text
+                    .split_off(self.terminal_width - self.line_number_len - 1),
+                line_info.line_number,
+            )
         };
         // 获取下一行内容
         let next_content_index = current_content_index + 1;
-        match self.file_content.get_mut(next_content_index) {
+        return match self.file_content.get_mut(next_content_index) {
             Some(line_info) => {
                 if line_info.is_wrapped {
+                    debug!("下一行已经换行，需要将内容插入到下一行的开头");
                     line_info.text.insert_str(0, &new_line_string);
-                    refresh_vec.push(next_content_index - cursor_height as usize);
-                    self.set_line_wrapped(next_content_index, refresh_vec);
+                    refresh_size += 1;
+                    self.set_line_wrapped(next_content_index, refresh_size)
                 } else {
+                    debug!("下一行未换行，需要将内容插入到一个新的行中");
                     self.file_content.insert(
                         current_content_index,
                         Line::new(new_line_string, line_number, true),
                     );
-                    refresh_vec.push(next_content_index - cursor_height as usize);
+                    refresh_size += 1;
+                    refresh_size
                 }
             }
             None => {
+                debug!("下一行不存在，需要将内容插入到一个新的行中");
                 self.file_content
                     .push(Line::new(new_line_string, line_number, true));
-                refresh_vec.push(next_content_index - cursor_height as usize);
+                refresh_size += 1;
+                refresh_size
             }
         };
     }

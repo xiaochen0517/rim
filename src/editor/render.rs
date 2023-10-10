@@ -143,13 +143,13 @@ impl Render {
     pub(crate) fn render_content_line(
         stdout: &mut Stdout,
         line_number_len: usize,
-        line_number: u16,
+        terminal_height_index: u16,
         line_info: &Line,
     ) {
         // 获取当前光标位置
         let cursor_position = cursor::position().unwrap().clone();
         // 移动光标到起使位置
-        execute!(stdout, cursor::MoveTo(0, line_number)).unwrap();
+        execute!(stdout, cursor::MoveTo(0, terminal_height_index)).unwrap();
         // 清空当前行
         execute!(stdout, Clear(ClearType::CurrentLine)).unwrap();
         execute!(stdout, SetForegroundColor(Color::Blue)).unwrap();
